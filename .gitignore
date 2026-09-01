@@ -6,9 +6,6 @@ backend/*/obj/
 *.nupkg
 .nuget/
 
-# EF Core design-time snapshot (keep migrations, ignore runtime files)
-backend/*/Data/Migrations/**/*.Designer.cs
-
 # Node / npm
 frontend/*/node_modules/
 frontend/*/dist/
