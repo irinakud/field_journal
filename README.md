@@ -113,6 +113,17 @@ The API now applies EF Core migrations on startup for relational databases by de
 
 ---
 
+## GitHub Actions
+
+This repository now includes a CI workflow at `/home/runner/work/field_journal/field_journal/.github/workflows/ci.yml` that runs on pull requests and pushes to `main`/`master`.
+
+- Back-end: `.NET 10` restore + test for `/home/runner/work/field_journal/field_journal/backend/FieldJournal.slnx`
+- Front-end: `npm ci`, `npm run lint`, `npm test`, and `npm run build` for `/home/runner/work/field_journal/field_journal/frontend/field-journal`
+
+This workflow validates the app before deployment. If you later choose a host with a deploy hook or CLI token, you can add a separate deploy workflow without replacing this CI check.
+
+---
+
 ## Running tests
 
 ### Back-end (xUnit)
