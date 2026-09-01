@@ -1,0 +1,38 @@
+# .NET build outputs
+backend/*/bin/
+backend/*/obj/
+
+# NuGet packages
+*.nupkg
+.nuget/
+
+# EF Core design-time snapshot (keep migrations, ignore runtime files)
+backend/*/Data/Migrations/**/*.Designer.cs
+
+# Node / npm
+frontend/*/node_modules/
+frontend/*/dist/
+frontend/*/.vite/
+frontend/*/.vitest/
+
+# Env / secrets
+appsettings.*.json
+!appsettings.Development.json
+*.user.json
+.env
+.env.local
+.env.*.local
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDEs
+.vs/
+.vscode/
+*.user
+*.suo
+*.swp
+
+# Docker
+pgdata/

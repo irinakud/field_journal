@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="FieldJournal.Api/FieldJournal.Api.csproj" />
+  <Project Path="FieldJournal.Tests/FieldJournal.Tests.csproj" />
+</Solution>
