@@ -7,13 +7,25 @@ using FieldJournal.Api.Data;
 using FieldJournal.Api.Services;
 
 var builder = WebApplication.CreateBuilder(args);
+var jwtKey = builder.Configuration["Jwt:Key"];
+if (string.IsNullOrWhiteSpace(jwtKey) || jwtKey.Length < 32)
+    throw new InvalidOperationException("Jwt:Key must be configured with a value at least 32 characters long.");
+
+var allowedOrigins = builder.Configuration
+    .GetSection("Cors:AllowedOrigins")
+    .Get<string[]>()
+    ?.Where(static origin => !string.IsNullOrWhiteSpace(origin))
+    .Select(static origin => origin.Trim().TrimEnd('/'))
+    .Distinct(StringComparer.OrdinalIgnoreCase)
+    .ToArray() ?? [];
+
+var applyMigrationsOnStartup = builder.Configuration.GetValue("Database:ApplyMigrationsOnStartup", true);
 
 // Database
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // JWT Auth
-var jwtKey = builder.Configuration["Jwt:Key"]!;
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
@@ -33,12 +45,16 @@ builder.Services.AddAuthorization();
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddControllers();
 
-// CORS — allow the React dev server
+// CORS
 builder.Services.AddCors(opts =>
-    opts.AddDefaultPolicy(p => p
-        .WithOrigins("http://localhost:5173")
-        .AllowAnyHeader()
-        .AllowAnyMethod()));
+    opts.AddDefaultPolicy(p =>
+    {
+        if (allowedOrigins.Length > 0)
+            p.WithOrigins(allowedOrigins);
+
+        p.AllowAnyHeader()
+            .AllowAnyMethod();
+    }));
 
 // Swagger
 builder.Services.AddEndpointsApiExplorer();
@@ -48,7 +64,7 @@ builder.Services.AddSwaggerGen(c =>
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
         In = ParameterLocation.Header,
-        Description = "Enter: ******",
+        Description = "Authorization header using the ******",
         Name = "Authorization",
         Type = SecuritySchemeType.ApiKey,
         Scheme = "Bearer"
@@ -67,8 +83,8 @@ builder.Services.AddSwaggerGen(c =>
 
 var app = builder.Build();
 
-// Auto-migrate on startup (relational DB only — ProviderName check avoids InMemory conflict in tests)
-if (app.Environment.IsDevelopment())
+// Auto-migrate on startup when enabled (relational DB only — ProviderName check avoids InMemory conflict in tests)
+if (applyMigrationsOnStartup)
 {
     using var scope = app.Services.CreateScope();
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();

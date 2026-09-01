@@ -8,7 +8,7 @@ A full-stack nature-observation logging app. Authenticated users can record wild
 |-------|-----------|
 | Front-end | React 19 + TypeScript, Vite, Tailwind CSS v4, Radix UI primitives |
 | Back-end | .NET 10 Minimal-host Web API, EF Core 9, Npgsql |
-| Auth | JWT ****** (BCrypt password hashing) |
+| Auth | JWT bearer tokens (BCrypt password hashing) |
 | Database | PostgreSQL 16 |
 | Tests (BE) | xUnit + WebApplicationFactory + EF Core InMemory |
 | Tests (FE) | Vitest + React Testing Library |
@@ -35,7 +35,7 @@ This starts a Postgres 16 container on `localhost:5432` with database `fieldjour
 
 ### 2 — Configure the back-end secrets
 
-Override the JWT key and DB password. Never commit real secrets.
+Override the JWT key and DB password. Never commit real secrets. You can copy `/home/runner/work/field_journal/field_journal/backend/FieldJournal.Api/.env.example` for a deployment-safe variable list.
 
 Using .NET user-secrets (recommended for development):
 
@@ -62,7 +62,7 @@ dotnet run
 # Swagger UI at http://localhost:5000/swagger
 ```
 
-EF Core migrations run automatically on first start (development mode).
+EF Core migrations run automatically on startup by default for relational databases.
 
 ### 4 — Run the front-end
 
@@ -72,6 +72,44 @@ npm install
 npm run dev
 # App at http://localhost:5173
 ```
+
+The front-end reads `VITE_API_URL` and defaults to `http://localhost:5000`. You can copy `/home/runner/work/field_journal/field_journal/frontend/field-journal/.env.example` to create a local `.env`.
+
+---
+
+## Production deployment
+
+### Required environment variables
+
+#### Back-end (`/home/runner/work/field_journal/field_journal/backend/FieldJournal.Api`)
+
+- `ConnectionStrings__DefaultConnection`
+- `Jwt__Key` *(required, minimum 32 characters)*
+- `Jwt__Issuer` *(optional override, defaults to `FieldJournalApi`)*
+- `Jwt__Audience` *(optional override, defaults to `FieldJournalClient`)*
+- `Cors__AllowedOrigins__0`, `Cors__AllowedOrigins__1`, ... *(set these to your deployed front-end URLs)*
+- `Database__ApplyMigrationsOnStartup` *(optional, defaults to `true`)*
+- `ASPNETCORE_URLS`
+
+The API now applies EF Core migrations on startup for relational databases by default, so a deployed service can initialize its schema automatically.
+
+#### Front-end (`/home/runner/work/field_journal/field_journal/frontend/field-journal`)
+
+- `VITE_API_URL` *(set this to the public URL of your deployed API)*
+
+### Suggested hosting split
+
+- Database: Render Postgres, Railway Postgres, Neon, or Supabase
+- API: Render, Railway, or Fly.io
+- Front-end: Vercel or Netlify
+
+### Deployment flow
+
+1. Create the managed PostgreSQL database.
+2. Deploy `/home/runner/work/field_journal/field_journal/backend/FieldJournal.Api` as a .NET web service with the variables above.
+3. Deploy `/home/runner/work/field_journal/field_journal/frontend/field-journal` as a static site after `npm install && npm run build`.
+4. Set `VITE_API_URL` to the API URL and set `Cors__AllowedOrigins__*` to the front-end URL.
+5. Verify register, login, create observation, and list observations in the deployed app.
 
 ---
 
