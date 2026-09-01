@@ -35,7 +35,7 @@ This starts a Postgres 16 container on `localhost:5432` with database `fieldjour
 
 ### 2 — Configure the back-end secrets
 
-Override the JWT key and DB password. Never commit real secrets. You can copy `/home/runner/work/field_journal/field_journal/backend/FieldJournal.Api/.env.example` for a deployment-safe variable list.
+Override the JWT key and DB password. Never commit real secrets. You can copy `backend/FieldJournal.Api/.env.example` for a deployment-safe variable list.
 
 Using .NET user-secrets (recommended for development):
 
@@ -73,7 +73,7 @@ npm run dev
 # App at http://localhost:5173
 ```
 
-The front-end reads `VITE_API_URL` and defaults to `http://localhost:5000`. You can copy `/home/runner/work/field_journal/field_journal/frontend/field-journal/.env.example` to create a local `.env`.
+The front-end reads `VITE_API_URL` and defaults to `http://localhost:5000`. You can copy `frontend/field-journal/.env.example` to create a local `.env`.
 
 ---
 
@@ -81,7 +81,7 @@ The front-end reads `VITE_API_URL` and defaults to `http://localhost:5000`. You 
 
 ### Required environment variables
 
-#### Back-end (`/home/runner/work/field_journal/field_journal/backend/FieldJournal.Api`)
+#### Back-end (`backend/FieldJournal.Api`)
 
 - `ConnectionStrings__DefaultConnection`
 - `Jwt__Key` *(required, minimum 32 characters)*
@@ -93,7 +93,7 @@ The front-end reads `VITE_API_URL` and defaults to `http://localhost:5000`. You 
 
 The API now applies EF Core migrations on startup for relational databases by default, so a deployed service can initialize its schema automatically.
 
-#### Front-end (`/home/runner/work/field_journal/field_journal/frontend/field-journal`)
+#### Front-end (`frontend/field-journal`)
 
 - `VITE_API_URL` *(set this to the public URL of your deployed API)*
 
@@ -106,8 +106,8 @@ The API now applies EF Core migrations on startup for relational databases by de
 ### Deployment flow
 
 1. Create the managed PostgreSQL database.
-2. Deploy `/home/runner/work/field_journal/field_journal/backend/FieldJournal.Api` as a .NET web service with the variables above.
-3. Deploy `/home/runner/work/field_journal/field_journal/frontend/field-journal` as a static site after `npm install && npm run build`.
+2. Deploy `backend/FieldJournal.Api` as a .NET web service with the variables above.
+3. Deploy `frontend/field-journal` as a static site after `npm install && npm run build`.
 4. Set `VITE_API_URL` to the API URL and set `Cors__AllowedOrigins__*` to the front-end URL.
 5. Verify register, login, create observation, and list observations in the deployed app.
 
@@ -115,10 +115,10 @@ The API now applies EF Core migrations on startup for relational databases by de
 
 ## GitHub Actions
 
-This repository now includes a CI workflow at `/home/runner/work/field_journal/field_journal/.github/workflows/ci.yml` that runs on pull requests and pushes to `main`/`master`.
+This repository now includes a CI workflow at `.github/workflows/ci.yml` that runs on pull requests and pushes to `main`/`master`.
 
-- Back-end: `.NET 10` restore + test for `/home/runner/work/field_journal/field_journal/backend/FieldJournal.slnx`
-- Front-end: `npm ci`, `npm run lint`, `npm test`, and `npm run build` for `/home/runner/work/field_journal/field_journal/frontend/field-journal`
+- Back-end: `.NET 10` restore + test for `backend/FieldJournal.slnx`
+- Front-end: `npm ci`, `npm run lint`, `npm test`, and `npm run build` for `frontend/field-journal`
 
 This workflow validates the app before deployment. If you later choose a host with a deploy hook or CLI token, you can add a separate deploy workflow without replacing this CI check.
 
