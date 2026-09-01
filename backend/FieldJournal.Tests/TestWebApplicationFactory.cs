@@ -11,6 +11,14 @@ public class TestWebApplicationFactory : WebApplicationFactory<Program>
 {
     private readonly string _dbName = "TestDb_" + Guid.NewGuid();
 
+    public TestWebApplicationFactory()
+    {
+        Environment.SetEnvironmentVariable("Jwt__Key", "test-secret-key-with-at-least-thirty-two-characters");
+        Environment.SetEnvironmentVariable("Jwt__Issuer", "FieldJournalApi");
+        Environment.SetEnvironmentVariable("Jwt__Audience", "FieldJournalClient");
+        Environment.SetEnvironmentVariable("Cors__AllowedOrigins__0", "http://localhost:5173");
+    }
+
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
         builder.UseEnvironment("Testing");

@@ -8,7 +8,7 @@ A full-stack nature-observation logging app. Authenticated users can record wild
 |-------|-----------|
 | Front-end | React 19 + TypeScript, Vite, Tailwind CSS v4, Radix UI primitives |
 | Back-end | .NET 10 Minimal-host Web API, EF Core 9, Npgsql |
-| Auth | JWT ****** (BCrypt password hashing) |
+| Auth | JWT bearer tokens (BCrypt password hashing) |
 | Database | PostgreSQL 16 |
 | Tests (BE) | xUnit + WebApplicationFactory + EF Core InMemory |
 | Tests (FE) | Vitest + React Testing Library |
