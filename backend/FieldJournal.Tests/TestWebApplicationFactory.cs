@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using FieldJournal.Api.Data;
 
@@ -13,6 +14,16 @@ public class TestWebApplicationFactory : WebApplicationFactory<Program>
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
         builder.UseEnvironment("Testing");
+        builder.ConfigureAppConfiguration((_, configBuilder) =>
+        {
+            configBuilder.AddInMemoryCollection(new Dictionary<string, string?>
+            {
+                ["Jwt:Key"] = "test-secret-key-with-at-least-thirty-two-characters",
+                ["Jwt:Issuer"] = "FieldJournalApi",
+                ["Jwt:Audience"] = "FieldJournalClient",
+                ["Cors:AllowedOrigins:0"] = "http://localhost:5173"
+            });
+        });
         builder.ConfigureServices(services =>
         {
             // Remove DbContextOptions<AppDbContext> AND the internal
